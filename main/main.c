@@ -21,7 +21,7 @@ static const char *TAG = "icm42670";
 #ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
-
+#define ALPHA 0.8 
 /* Find gpio definitions in sdkconfig */
 
 void icm42670_test(void *pvParameters)
@@ -69,15 +69,18 @@ void icm42670_test(void *pvParameters)
     data_register6= ICM42670_REG_GYRO_DATA_Z1;
     // ESP_ERROR_CHECK(icm42670_read_raw_data(&dev, INT_SOURCE1, &raw_reading));
     // printf("%d\n", raw_reading);
-
+    int g=0;
     // now poll selected accelerometer or gyro raw value directly from registers
     while (1)
     {
         ESP_ERROR_CHECK(icm42670_read_raw_data(&dev, data_register2, &raw_reading));
 
         //ESP_LOGI(TAG, "Raw accelerometer / gyro reading: %d", raw_reading);
-        printf("%d %d %d\n",5000,raw_reading,-5000);
-
+        // printf("%d %d %d\n",5000,raw_reading,-5000);
+        //float accel_y = raw_reading/2048.0;
+        g=0.9*g+0.1*raw_reading;
+        float lin_accel_y = raw_reading-g;
+        printf("%d %.2f %d\n",2000,lin_accel_y,-2000);
         vTaskDelay(pdMS_TO_TICKS(75));
     }
 }
